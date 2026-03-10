@@ -8,7 +8,7 @@ namespace BloogBot.UI
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-#if DEBUG
+#if false
             Debugger.Launch();
 #endif
 

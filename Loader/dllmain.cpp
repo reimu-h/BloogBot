@@ -57,7 +57,7 @@ unsigned __stdcall ThreadMain(void* pParam)
 	AllocConsole();
 	freopen("CONOUT$", "w", stdout);
 
-#if _DEBUG
+#if false
 	std::cout << std::string("Attach a debugger now to WoW.exe if you want to debug Loader.dll. Waiting 10 seconds...") << std::endl;
 
 	HANDLE hEvent = CreateEvent(nullptr, TRUE, FALSE, L"MyDebugEvent");
