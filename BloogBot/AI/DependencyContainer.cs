@@ -127,7 +127,7 @@ namespace BloogBot.AI
                 // filter units by unit reactions as specified in targeting settings
                 .Where(u => BotSettings.UnitReactions.Count == 0 || BotSettings.UnitReactions.Contains(u.UnitReaction.ToString()))
                 // filter units by creature type as specified in targeting settings. also include things like totems and slimes.
-                .Where(u => BotSettings.CreatureTypes.Count == 0 || u.CreatureType == CreatureType.Mechanical || (u.CreatureType == CreatureType.Totem && u.Position.DistanceTo(ObjectManager.Player?.Position) <= 20) || BotSettings.CreatureTypes.Contains(u.CreatureType.ToString()) || oozeNames.Contains(u.Name))
+                .Where(u => BotSettings.CreatureTypes.Count == 0 || (u.CreatureType == CreatureType.Totem && u.Position.DistanceTo(ObjectManager.Player?.Position) <= 20) || BotSettings.CreatureTypes.Contains(u.CreatureType.ToString()) || oozeNames.Contains(u.Name))
                 // filter by the level range specified in targeting settings
                 .Where(u => u.Level <= ObjectManager.Player?.Level + BotSettings.LevelRangeMax && u.Level >= ObjectManager.Player?.Level - BotSettings.LevelRangeMin)
                 // exclude certain factions known to cause targeting issues (like neutral, non attackable NPCs in town)

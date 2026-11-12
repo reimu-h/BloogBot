@@ -44,6 +44,8 @@ namespace BloogBot
 
         public bool CreatureTypeGiant { get; set; }
 
+        public bool CreatureTypeMechanical { get; set; }
+
         public bool UnitReactionHostile { get; set; }
 
         public bool UnitReactionUnfriendly { get; set; }
@@ -127,6 +129,7 @@ namespace BloogBot
                 if (CreatureTypeHumanoid) creatureTypes.Add("Humanoid");
                 if (CreatureTypeUndead) creatureTypes.Add("Undead");
                 if (CreatureTypeGiant) creatureTypes.Add("Giant");
+                if (CreatureTypeMechanical) creatureTypes.Add("Mechanical");
 
                 return creatureTypes;
             }

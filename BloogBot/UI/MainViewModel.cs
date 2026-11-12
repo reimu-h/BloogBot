@@ -1327,6 +1327,17 @@ namespace BloogBot.UI
         }
 
         [BotSetting]
+        public bool CreatureTypeMechanical
+        {
+            get => botSettings.CreatureTypeMechanical;
+            set
+            {
+                botSettings.CreatureTypeMechanical = value;
+                OnPropertyChanged(nameof(CreatureTypeMechanical));
+            }
+        }
+
+        [BotSetting]
         public bool UnitReactionHostile
         {
             get => botSettings.UnitReactionHostile;
