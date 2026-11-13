@@ -1721,7 +1721,7 @@ namespace BloogBot.UI
         void OnChatMessageCallback(object sender, OnChatMessageArgs e)
         {
             var player = ObjectManager.Player;
-            if (player != null && !CityNames.Contains(ObjectManager.ZoneText))
+            if (player != null && player.IsValid && !CityNames.Contains(ObjectManager.ZoneText))
             {
                 if (e.ChatChannel == "Say")
                     DiscordClientWrapper.SendMessage($"{player.Name} saw a chat message from {e.UnitName}: {e.Message}");
@@ -1740,7 +1740,7 @@ namespace BloogBot.UI
                 {
                     var player = ObjectManager.Player;
 
-                    if (player != null)
+                    if (player != null && player.IsValid)
                     {
                         if (!readyForCommands)
                         {
