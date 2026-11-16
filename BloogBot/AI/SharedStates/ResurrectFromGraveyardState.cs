@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using BloogBot.Game;
 using BloogBot.Game.Objects;
@@ -26,8 +26,13 @@ namespace BloogBot.AI.SharedStates
             // At any point, if we're already alive, just leave the state.
             if (!player.InGhostForm)
             {
-                Wait.RemoveAll();
-                botStates.Pop();
+                // InGhostForm queries Lua (UnitIsGhost) and defaults to false if the call returns
+                // empty (e.g. during a loading screen), so verify Health > 0 before popping.
+                if (player.Health > 0)
+                {
+                    Wait.RemoveAll();
+                    botStates.Pop();
+                }
                 return;
             }
 
@@ -53,7 +58,8 @@ namespace BloogBot.AI.SharedStates
             {
                 if (Wait.For("LeaveDelay", 2000))
                 {
-                    if (player.InGhostForm)
+                    // Also require Health > 0 so transient empty InGhostForm Lua reads don't pop while dead.
+                    if (player.InGhostForm || player.Health <= 0)
                     {
                         // Somehow we didn't successfully resurrect. Just try again.
                         state = State.Uninitialized;

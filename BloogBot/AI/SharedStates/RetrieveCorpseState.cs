@@ -1,4 +1,4 @@
-﻿using BloogBot.Game;
+using BloogBot.Game;
 using BloogBot.Game.Enums;
 using BloogBot.Game.Objects;
 using System;
@@ -35,8 +35,13 @@ namespace BloogBot.AI.SharedStates
             {
                 if (!player.InGhostForm)
                 {
-                    // We are already alive. No need to do anything.
-                    botStates.Pop();
+                    // InGhostForm queries Lua (UnitIsGhost) and defaults to false if the call returns
+                    // empty (e.g. during a loading screen), so verify Health > 0 before popping.
+                    if (player.Health > 0)
+                    {
+                        // We are already alive. No need to do anything.
+                        botStates.Pop();
+                    }
                     return;
                 }
 
@@ -124,9 +129,9 @@ namespace BloogBot.AI.SharedStates
                 if (Wait.For("LeaveRetrieveCorpseStateDelay", 2000))
                 {
                     // In some cases we failed to res. E.g. when we checked for res distance we
-                    // happened to be in range while falling off a cliff. In that case, we should
-                    // try again.
-                    if (player.InGhostForm)
+                    // happened to be in range while falling off a cliff. Also require Health > 0
+                    // so transient empty InGhostForm Lua reads retry instead of popping while dead.
+                    if (player.InGhostForm || player.Health <= 0)
                     {
                         state = State.Initializing;
                     }

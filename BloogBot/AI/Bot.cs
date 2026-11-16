@@ -1,4 +1,4 @@
-﻿using BloogBot.AI.SharedStates;
+using BloogBot.AI.SharedStates;
 using BloogBot.Game;
 using BloogBot.Game.Enums;
 using BloogBot.UI;
@@ -35,10 +35,14 @@ namespace BloogBot.AI
         public void Stop()
         {
             running = false;
+            retrievingCorpse = false;
+            isFalling = false;
             currentLevel = 0;
 
             while (botStates.Count > 0)
+            {
                 botStates.Pop();
+            }
 
             stopCallback?.Invoke();
         }
@@ -495,7 +499,8 @@ namespace BloogBot.AI
                             isFalling = false;
                         }
 
-                        if (botStates.Count > 0 && (botStates.Peek()?.GetType() == typeof(GrindState) || botStates.Peek()?.GetType() == typeof(PowerlevelState)))
+                        var topState = botStates.Count > 0 ? botStates.Peek() : null;
+                        if (topState is GrindState || topState is PowerlevelState || topState is GatherState)
                         {
                             if (retrievingCorpse)
                             {
