@@ -44,6 +44,8 @@ namespace BloogBot.AI
                 botStates.Pop();
             }
 
+            Wait.RemoveAll();
+
             stopCallback?.Invoke();
         }
 
@@ -678,6 +680,8 @@ namespace BloogBot.AI
         {
             while (botStates.Count > 1)
                 botStates.Pop();
+
+            Wait.RemoveAll();
         }
     }
 }
