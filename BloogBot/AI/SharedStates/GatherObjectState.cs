@@ -37,7 +37,7 @@ namespace BloogBot.AI.SharedStates
                 startTime = Environment.TickCount;
             }
 
-            if (player.IsInCombat && container.FindClosestTarget() != null)
+            if (player.IsInCombat && container.FindThreat() != null)
             {
                 botStates.Pop();
                 return;
