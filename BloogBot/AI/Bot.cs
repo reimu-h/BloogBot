@@ -312,6 +312,16 @@ namespace BloogBot.AI
                             isFalling = true;
                         }
 
+                        if (retrievingCorpse && player.IsAlive)
+                        {
+                            player.StopAllMovement();
+                            PopStackToBaseState();
+                            container.DisableTeleportChecker = false;
+                            teleportCheckPosition = player.Position;
+                            currentPosition = player.Position;
+                            currentPositionStartTime = Environment.TickCount;
+                        }
+
                         if (player.Position.DistanceTo(teleportCheckPosition) > 10 && !container.DisableTeleportChecker && container.BotSettings.UseTeleportKillswitch)
                         {
                             DiscordClientWrapper.TeleportAlert(player.Name);
@@ -326,9 +336,18 @@ namespace BloogBot.AI
                             isFalling = false;
                         }
 
-                        if (botStates.Count > 0 && botStates.Peek()?.GetType() == typeof(GrindState))
+                        var topState = botStates.Count > 0 ? botStates.Peek() : null;
+                        if (topState is GrindState || topState is PowerlevelState || topState is GatherState)
                         {
-                            container.RunningErrands = false;
+                            if (retrievingCorpse)
+                            {
+                                botStates.Push(container.CreateRestState(botStates, container));
+                            }
+                            else
+                            {
+                                container.RunningErrands = false;
+                            }
+
                             retrievingCorpse = false;
                         }
 
@@ -369,10 +388,11 @@ namespace BloogBot.AI
 
                             container.DisableTeleportChecker = true;
 
-                            botStates.Push(container.CreateRestState(botStates, container));
                             botStates.Push(new RetrieveCorpseState(botStates, container));
                             botStates.Push(new MoveToCorpseState(botStates, container));
                             botStates.Push(new ReleaseCorpseState(botStates, container));
+
+                            return;
                         }
 
                         var currentHotspot = container.GetCurrentHotspot();
@@ -437,6 +457,7 @@ namespace BloogBot.AI
                             // We need to clear all states because some references are no longer
                             // valid.
                             botStates.Clear();
+                            retrievingCorpse = false;
                             switch (container.BotSettings.LastUsedBotType)
                             {
                                 case BotSettings.BotType.Grinding:
@@ -491,6 +512,16 @@ namespace BloogBot.AI
                         {
                             container.DisableTeleportChecker = true;
                             isFalling = true;
+                        }
+
+                        if (retrievingCorpse && player.IsAlive)
+                        {
+                            player.StopAllMovement();
+                            PopStackToBaseState();
+                            container.DisableTeleportChecker = false;
+                            teleportCheckPosition = player.Position;
+                            currentPosition = player.Position;
+                            currentPositionStartTime = Environment.TickCount;
                         }
 
                         if (player.Position.DistanceTo(teleportCheckPosition) > 5 && !container.DisableTeleportChecker && container.BotSettings.UseTeleportKillswitch)

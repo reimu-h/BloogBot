@@ -26,9 +26,7 @@ namespace BloogBot.AI.SharedStates
             // At any point, if we're already alive, just leave the state.
             if (!player.InGhostForm)
             {
-                // InGhostForm queries Lua (UnitIsGhost) and defaults to false if the call returns
-                // empty (e.g. during a loading screen), so verify Health > 0 before popping.
-                if (player.Health > 0)
+                if (player.IsAlive)
                 {
                     Wait.RemoveAll();
                     botStates.Pop();
@@ -70,8 +68,7 @@ namespace BloogBot.AI.SharedStates
             {
                 if (Wait.For("LeaveDelay", 2000))
                 {
-                    // Also require Health > 0 so transient empty InGhostForm Lua reads don't pop while dead.
-                    if (player.InGhostForm || player.Health <= 0)
+                    if (!player.IsAlive)
                     {
                         // Somehow we didn't successfully resurrect. Just try again.
                         state = State.Uninitialized;
