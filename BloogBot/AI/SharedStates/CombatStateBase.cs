@@ -1,4 +1,4 @@
-﻿using BloogBot.Game;
+using BloogBot.Game;
 using BloogBot.Game.Enums;
 using BloogBot.Game.Objects;
 using BloogBot.Properties;
