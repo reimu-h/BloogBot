@@ -1,4 +1,4 @@
-﻿using BloogBot.Game.Enums;
+using BloogBot.Game.Enums;
 using System;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
@@ -229,15 +229,9 @@ namespace BloogBot.Game
             LuaCall("JumpOrAscendStart()");
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        delegate void LootSlotDelegate(int slot);
-
-        static readonly LootSlotDelegate LootSlotFunction =
-            Marshal.GetDelegateForFunctionPointer<LootSlotDelegate>((IntPtr)MemoryAddresses.LootSlotFunPtr);
-
         public void LootSlot(int slot)
         {
-            LootSlotFunction(slot);
+            LuaCall($"LootSlot({slot + 1})");
         }
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]

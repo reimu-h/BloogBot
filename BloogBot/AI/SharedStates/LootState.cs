@@ -15,8 +15,8 @@ namespace BloogBot.AI.SharedStates
         readonly WoWUnit target;
         readonly LocalPlayer player;
         readonly StuckHelper stuckHelper;
-        readonly int startTime = Environment.TickCount;
 
+        int? startTime;
         int stuckCount;
         LootFrame lootFrame;
         int lootIndex;
@@ -36,6 +36,11 @@ namespace BloogBot.AI.SharedStates
 
         public void Update()
         {
+            if (!startTime.HasValue)
+            {
+                startTime = Environment.TickCount;
+            }
+
             if (player.Position.DistanceTo(target.Position) >= 5)
             {
                 var nextWaypoint = Navigation.GetNextWaypoint(ObjectManager.MapId, player.Position, target.Position, false);
@@ -65,8 +70,15 @@ namespace BloogBot.AI.SharedStates
             //  - loot frame is open, but we've already looted everything we want
             //  - stuck count is greater than 5 (perhaps the corpse is in an awkward position the character can't reach)
             //  - we've been in the loot state for over 10 seconds (again, perhaps the corpse is unreachable. most common example of this is when a mob dies on a cliff that we can't climb)
-            if ((currentState == LootStates.Initial && !target.CanBeLooted) || (lootFrame != null && lootIndex == lootFrame.LootItems.Count) || stuckCount > 5 || Environment.TickCount - startTime > 10000)
+            if ((currentState == LootStates.Initial && !target.CanBeLooted)
+                || (lootFrame != null && lootIndex == lootFrame.LootItems.Count && Wait.For("LootDelay", 150))
+                || stuckCount > 5
+                || Environment.TickCount - startTime.Value > 10000)
             {
+                if (currentState != LootStates.Initial)
+                {
+                    LootFrame.Close();
+                }
                 player.StopAllMovement();
                 botStates.Pop();
                 botStates.Push(new SkinningState(botStates, container, target));
@@ -96,8 +108,9 @@ namespace BloogBot.AI.SharedStates
                 if (itemQuality == ItemQuality.Rare || itemQuality == ItemQuality.Epic)
                     DiscordClientWrapper.SendItemNotification(player.Name, itemQuality, itemToLoot.ItemId);
 
+                var excludedNames = container.BotSettings.LootExcludedNames?.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
                 if (itemToLoot.IsCoins
-                    || ((string.IsNullOrWhiteSpace(container.BotSettings.LootExcludedNames) || !container.BotSettings.LootExcludedNames.Split('|').Any(en => itemToLoot.Info.Name.Contains(en)))
+                    || ((excludedNames == null || itemToLoot.Info?.Name == null || !excludedNames.Any(en => itemToLoot.Info.Name.Contains(en)))
                     && (poorQualityCondition || commonQualityCondition || uncommonQualityCondition || other)))
                 {
                     itemToLoot.Loot();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BloogBot.Game;
@@ -93,8 +93,9 @@ namespace BloogBot.AI.SharedStates
                 if (itemQuality == ItemQuality.Rare || itemQuality == ItemQuality.Epic)
                     DiscordClientWrapper.SendItemNotification(player.Name, itemQuality, itemToLoot.ItemId);
 
+                var excludedNames = container.BotSettings.LootExcludedNames?.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
                 if (itemToLoot.IsCoins
-                    || ((string.IsNullOrWhiteSpace(container.BotSettings.LootExcludedNames) || !container.BotSettings.LootExcludedNames.Split('|').Any(en => itemToLoot.Info.Name.Contains(en)))
+                    || ((excludedNames == null || itemToLoot.Info?.Name == null || !excludedNames.Any(en => itemToLoot.Info.Name.Contains(en)))
                     && (poorQualityCondition || commonQualityCondition || uncommonQualityCondition || other)))
                 {
                     itemToLoot.Loot();
@@ -106,6 +107,10 @@ namespace BloogBot.AI.SharedStates
 
         void Exit()
         {
+            if (lootFrame != null)
+            {
+                LootFrame.Close();
+            }
             player.StopAllMovement();
             botStates.Pop();
             botStates.Push(new EquipBagsState(botStates, container));
